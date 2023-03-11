@@ -5,18 +5,25 @@ import json
 import base64
 from make_ccache import make_ccache
 import os
+import moira
+import functools
 
 """
 Decorator that makes endpoint return plaintext instead of HTML
 """
 def plaintext(func):
+    # https://realpython.com/primer-on-python-decorators/#who-are-you-really
+    # Necessary for Flask
+    @functools.wraps(func)
     def wrapped(*args, **kwargs):
         orig_response = func(*args, **kwargs)
         response = make_response(orig_response, 200)
         response.mimetype = 'text/plain'
         # https://stackoverflow.com/questions/57296472/how-to-return-plain-text-from-flask-endpoint-needed-by-prometheus
         return response
+    
     return wrapped
+
 
 """
 Decorator that makes sure a webathena token is passed to the request.
@@ -24,6 +31,8 @@ API requests accept two forms of passing it:
 
 * "Authorization: webathena [base64-encoded JSON]" header
 * "webathena" GET parameter (also base64-encoded JSON)
+
+Pattern inspired by mailto code.
 """
 def webathena(func):
     def get_webathena_json() -> dict | None:
@@ -35,7 +44,10 @@ def webathena(func):
             return None
         return json.loads(base64.b64decode(auth))
 
+    @functools.wraps(func)
     def wrapped(*args, **kwargs):
+        from api import app
+
         # Just in case, clear environment variable (defensively)
         if 'KRB5CCNAME' in os.environ:
             del os.environ['KRB5CCNAME']
@@ -43,19 +55,69 @@ def webathena(func):
         try:
             cred = get_webathena_json()
         except binascii.Error:
-            return {'error': 'Invalid base64 given in "webathena"'}, 400
+            return {'error': {'description': 'Invalid base64 given in "webathena"'}}, 400
         except json.decoder.JSONDecodeError:
-            return {'error': 'base64 does not decode to JSON!'}, 400
+            return {'error': {'description': 'base64 does not decode to JSON!'}}, 400
         if not cred:
-            return {'error': 'No authentication given!'}, 404
+            # Make local testing easier by using own tickets
+            if app.debug:
+                return func(*args, **kwargs)
+            else:
+                return {'error': {'description': 'No authentication given!'}}, 401
         else:
             # temporary file only exists in "with" scope
             with NamedTemporaryFile(prefix='ccache_') as ccache:
                 try:
                     ccache.write(make_ccache(cred))
                 except KeyError as e:
-                    return {'error': f'Malformed credential, missing key {e.args[0]}'}
+                    return {'error': {'description': f'Malformed credential, missing key {e.args[0]}'}}, 400
                 ccache.flush()
                 os.environ['KRB5CCNAME'] = ccache.name
                 return func(*args, **kwargs)
+    return wrapped
+
+
+_moira_errors_inverse = {v:k for k,v in moira.errors().items()}
+def get_moira_error_name(code):
+    return _moira_errors_inverse[code]
+
+def moira_query(func):
+    """
+    A decorator that opens an authenticated Moira session before the wrapped
+    function is executed.
+
+    Afterwards, it parses errors and returns them according to the API spec
+
+    With this decorator combined with @webathena, all you need to do to define
+    an API method is to call moira.query with the desired query and then parse
+    the output if needed
+
+    Initially taken from mailto code.
+    """
+    CLIENT_NAME = 'webmoira2'
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        moira.connect()
+        moira.auth(CLIENT_NAME)
+        try:
+            return func(*args, **kwargs)
+        except moira.MoiraException as e:
+            error_code = e.code
+            error_message = e.message
+            error_name = get_moira_error_name(error_code)
+            status_code = 500
+            
+            # Some special case status codes:
+            if error_name == 'MR_PERM':
+                status_code = 403
+            elif error_name == 'MR_NO_MATCH':
+                status_code = 404
+            
+            return {
+                'code': error_code,
+                'name': error_name,
+                'message': error_message,
+            }, status_code
+
     return wrapped

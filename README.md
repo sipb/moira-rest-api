@@ -4,12 +4,24 @@ The backend will be a Flask Python API around the Python bindings for the Moira 
 
 This could also be a general-purpose API around Moira calls (not necessarily mailing-list related ones), so it should outgrow this repo soon enough.
 
-# Webathena authentication
+## Webathena authentication
 
 All requests must be authenticated. There are two ways to do this:
 
 * `Authorization: webathena [base64-encoded JSON]` header
 * `webathena` GET parameter (also base64-encoded JSON)
+
+## Errors
+
+If any of the functions returns an error, the output will be the following:
+
+```json
+{
+    "code": int | undefined, // error code, only if the error is a moira error
+    "name": string | undefined, // short error name
+    "description": string, //description of the error
+}
+```
 
 # HTTP API documentation
 
@@ -36,6 +48,7 @@ Returns:
 ```json
 {
     "name": string,
+    "kerb": string,
     "mit_id": int,
     "class_year": string,
     "department": string,
