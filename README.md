@@ -4,9 +4,20 @@ The backend will be a Flask Python API around the Python bindings for the Moira 
 
 This could also be a general-purpose API around Moira calls (not necessarily mailing-list related ones), so it should outgrow this repo soon enough.
 
-All requests must be authenticated (TODO: define how)
+# Webathena authentication
+
+All requests must be authenticated. There are two ways to do this:
+
+* `Authorization: webathena [base64-encoded JSON]` header
+* `webathena` GET parameter (also base64-encoded JSON)
 
 # HTTP API documentation
+
+## Test that authentication is working
+
+`GET /test`
+
+Shows the kerberos tickets you passed to the server, or otherwise shows you whether authentication worked. Designed only to be tested by a human. Clients should use `GET /users/me` instead.
 
 ## Users (related to moira lists)
 
@@ -90,7 +101,19 @@ Errors:
 * 404: user not found
 * 403: permission denied (if you try to query someone other than yourself)
 
+### Get tap access user is in
+
+`GET /users/{name}/tapaccess`
+
+```
+$ qy _help gplm
+
+   get_pacs_lists_of_member, gplm (member_type, member_name) => list_name, active, publicflg, hidden, maillist, grouplist
+```
+
 ## Moira Lists
+
+Some info on list properties: http://kb.mit.edu/confluence/display/istcontrib/Moira+List+Settings+Legend#the_group
 
 ### Get all (public) lists (by filter)
 
