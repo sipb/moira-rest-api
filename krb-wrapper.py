@@ -1,5 +1,5 @@
 """
-Python 2(!) code to convert the credential format from the WebAthena JSON response
+Python code to convert the credential format from the WebAthena JSON response
 into a credential cache ("ccache") that actual desktop utilities or APIs can use
 
 make_ccache is the important function (the rest are helper functions)
