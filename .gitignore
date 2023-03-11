@@ -1,2 +1,5 @@
 # My own kerberos tickets
 private-*
+
+# Python cache
+__pycache__

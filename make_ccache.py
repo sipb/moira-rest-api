@@ -153,24 +153,11 @@ def make_ccache(cred: dict) -> bytes:
     out += _ccache_credential(cred)
     return out
 
-# SSH-specific code skipped
-# But the key part seems to be this:
-# (in particular the environment variable to specify which credential cache to use)
 
-# with NamedTemporaryFile(prefix="siab_ccache_") as ccache:
-#     # Write the credentials into a krb5 ccache.
-#     ccache.write(make_ccache(cred))
-#     ccache.flush()
-
-#     env = dict(os.environ)
-#     env['KRB5CCNAME'] = ccache.name
-
-#     return subprocess.call(command, env=env)
-
+# Manual testing
 if __name__ == '__main__':
     import subprocess
     import os
-    import sys
     import json
 
     with open('private-test-ticket.json', 'rb') as f:
