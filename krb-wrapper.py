@@ -9,8 +9,10 @@ Taken from SSH (shellinabox) example in https://github.com/davidben/webathena.
 
 # TODO: mirate to Python 3!
 
+# from builtins import chr
 import base64
 import struct
+from tempfile import NamedTemporaryFile
 
 # Some DER encoding stuff. Bleh. This is because the ccache contains a
 # DER-encoded krb5 Ticket structure, whereas Webathena deserializes
@@ -175,3 +177,20 @@ def make_ccache(cred):
 #     env['KRB5CCNAME'] = ccache.name
 
 #     return subprocess.call(command, env=env)
+
+if __name__ == '__main__':
+    import subprocess
+    import os
+    import sys
+    import json
+
+    with open('private-test-ticket.json', 'rb') as f:
+        cred = json.loads(f.read().decode())
+
+    with NamedTemporaryFile(prefix='ccache_') as ccache:
+        print(ccache.name)
+        ccache.write(make_ccache(cred))
+        ccache.flush()
+        env = dict(os.environ)
+        env['KRB5CCNAME'] = ccache.name
+        subprocess.call(['klist'], env=env)
