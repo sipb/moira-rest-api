@@ -5,11 +5,15 @@ import moira
 
 app = Flask(__name__)
 
-# I wanted to separate this into multiple files, but it seems
-# non-trivial: 
+# I wanted to separate this into multiple files, but it seems non-trivial: 
 # https://www.reddit.com/r/flask/comments/m3kp1i/splitting_flask_app_into_multiple_files/
 # https://flask.palletsprojects.com/en/2.2.x/patterns/appfactories/
 # So I think one file will suffice
+
+@app.get('/')
+@plaintext
+def home():
+    return 'Welcome to the Moira API! This is work-in-progress.\nFor documentation see: https://github.com/gabrc52/webmoira2/tree/main/backend'
 
 @app.get('/test')
 @webathena
@@ -25,10 +29,16 @@ def not_found(error):
         'description': f'{error}',
     }
 
+@app.get('/whoami')
+@webathena
+@plaintext
+def whoami(kerb):
+    return kerb
+
 @app.get('/users/<string:user>')
 @webathena
 @moira_query
-def get_user(user):
+def get_user(user, kerb):
     res = moira.query('get_user_by_login', user)
     assert len(res) == 1
     return res[0]

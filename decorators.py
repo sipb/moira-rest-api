@@ -32,6 +32,8 @@ API requests accept two forms of passing it:
 * "Authorization: webathena [base64-encoded JSON]" header
 * "webathena" GET parameter (also base64-encoded JSON)
 
+The username of the authenticated user is passed as a name parameter `kerb`
+
 Pattern inspired by mailto code.
 """
 def webathena(func):
@@ -61,7 +63,7 @@ def webathena(func):
         if not cred:
             # Make local testing easier by using own tickets
             if app.debug:
-                return func(*args, **kwargs)
+                return func(*args, **kwargs, kerb=os.environ['USER'])
             else:
                 return {'error': {'description': 'No authentication given!'}}, 401
         else:
@@ -69,11 +71,12 @@ def webathena(func):
             with NamedTemporaryFile(prefix='ccache_') as ccache:
                 try:
                     ccache.write(make_ccache(cred))
+                    kerb = cred['cname']['nameString']
                 except KeyError as e:
                     return {'error': {'description': f'Malformed credential, missing key {e.args[0]}'}}, 400
                 ccache.flush()
                 os.environ['KRB5CCNAME'] = ccache.name
-                return func(*args, **kwargs)
+                return func(*args, **kwargs, kerb=kerb)
     return wrapped
 
 
