@@ -49,10 +49,6 @@ def webathena(func):
 
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        # fname = inspect.currentframe().f_code.co_name
-        fname = inspect.stack()[0][3]
-        print(f'running webathena wrapper for {fname}')
-
         try:
             cred = get_webathena_json()
         except binascii.Error:
@@ -60,19 +56,15 @@ def webathena(func):
         except json.decoder.JSONDecodeError:
             return {'error': {'description': 'base64 does not decode to JSON!'}}, 400
         if not cred:
-            print('credential NOT found')
             from api import app
             # Make local testing easier by using own tickets
             if app.debug:
-                print('using our own tickets instead of given credential')
                 return func(*args, **kwargs, kerb=os.environ['USER'])
             else:
                 return {'error': {'description': 'No authentication given!'}}, 401
         else:
-            print('credential found!')
             # temporary file only exists in "with" scope
             with NamedTemporaryFile(prefix='ccache_') as ccache:
-                print('making temporary file', ccache.name)
                 try:
                     ccache.write(make_ccache(cred))
                     kerb = cred['cname']['nameString'][0]
@@ -80,9 +72,7 @@ def webathena(func):
                     return {'error': {'description': f'Malformed credential, missing key {e.args[0]}'}}, 400
                 ccache.flush()
                 os.environ['KRB5CCNAME'] = ccache.name
-                print(f'webathena ({fname}): entering wrapped function')
                 response = func(*args, **kwargs, kerb=kerb)
-                print(f'webathena ({fname}): exiting wrapped function')
 
                 # Make sure to unset the environment variable, just in case
                 del os.environ['KRB5CCNAME']
@@ -114,20 +104,16 @@ def moira_query(func):
     def wrapped(*args, **kwargs):
         # fname = inspect.currentframe().f_code.co_name
         fname = inspect.stack()[0][3]
-        print(f'running moira wrapper for {fname}')
-        print('attempting to authenticate')
         moira.connect()
         moira.auth(CLIENT_NAME)
         try:
-            print(f'moira ({fname}): entering wrapped function')
             response = func(*args, **kwargs)
-            print(f'moira ({fname}): exiting wrapped function')
+            moira.disconnect()
             return response
         except moira.MoiraException as e:
             error_code = e.code
             error_message = e.message
             error_name = get_moira_error_name(error_code)
-            print(f'moira ({fname}): exception {error_name} caught')
             status_code = 500
             
             # Some special case status codes:

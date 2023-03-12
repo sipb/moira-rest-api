@@ -164,19 +164,20 @@ if __name__ == '__main__':
     with open('private-test-ticket.json', 'rb') as f:
         cred = json.loads(f.read().decode())
 
-    with NamedTemporaryFile(prefix='ccache_') as ccache:
-        ccache.write(make_ccache(cred))
-        ccache.flush()
-        os.environ['KRB5CCNAME'] = ccache.name
+    for i in range(2):
+        with NamedTemporaryFile(prefix='ccache_') as ccache:
+            ccache.write(make_ccache(cred))
+            ccache.flush()
+            os.environ['KRB5CCNAME'] = ccache.name
 
-        # Make sure ticket works
-        username = cred['cname']['nameString'][0]
-        subprocess.call(['klist', '-f'])
+            # Make sure ticket works
+            username = cred['cname']['nameString'][0]
+            subprocess.call(['klist', '-f'])
 
-        # Make sure Moira works
-        moira.connect()
-        moira.auth('python3')
-        print(moira.query('get_user_by_login', username)[0])
+            # Make sure Moira works
+            moira.connect()
+            moira.auth('python3')
+            print(moira.query('get_user_by_login', username)[0])
 
-        # Delete environment variable
-        del os.environ['KRB5CCNAME']
+            # Delete environment variable
+            del os.environ['KRB5CCNAME']

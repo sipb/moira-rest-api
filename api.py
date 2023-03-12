@@ -19,7 +19,7 @@ def home():
 @app.get('/klist')
 @webathena
 @plaintext
-def test(kerb):
+def klist(kerb):
     result = subprocess.run(['klist', '-f'], stdout=subprocess.PIPE)
     return result.stdout.decode()
 
@@ -339,9 +339,8 @@ def delete_list_membership_admin(list_name, kerb):
 
 
 
-# TODO: don't do this in production
+app.debug = True
 if __name__ == '__main__':
-    app.debug = True
     # app.run(host="0.0.0.0", port=8000)
     app.run()
 else:
