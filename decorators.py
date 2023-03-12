@@ -97,7 +97,8 @@ def moira_query(func):
 
     Initially taken from mailto code.
     """
-    CLIENT_NAME = 'webmoira2'
+    # webmoira2 is one character too long
+    CLIENT_NAME = 'python3'
 
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
@@ -116,6 +117,13 @@ def moira_query(func):
                 status_code = 403
             elif error_name == 'MR_NO_MATCH':
                 status_code = 404
+            elif error_name == 'MR_IN_USE':
+                # i.e. can't delete a list because it is in use
+                # the precondition is that it must not have any members etc
+                # (i'm unsure if this is the best status code to return, probably not)
+                status_code = 412
+            elif error_name == 'MR_EXISTS':
+                status_code = 409
             
             return {
                 'code': error_code,
