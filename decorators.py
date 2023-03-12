@@ -132,3 +132,12 @@ def moira_query(func):
             }, status_code
 
     return wrapped
+
+
+def authenticated_moira(func):
+    """
+    Decorator that nests both decorators, because Python decorator behavior
+    seems inconsistent, and you need to have tickets in order to 
+    authenticate with moira
+    """
+    return moira_query(webathena(func))

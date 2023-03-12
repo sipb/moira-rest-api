@@ -1,6 +1,6 @@
 import subprocess
 from flask import Flask, request, Response
-from decorators import webathena, plaintext, moira_query
+from decorators import webathena, plaintext, authenticated_moira
 import moira
 from util import *
 
@@ -45,8 +45,7 @@ def whoami(kerb):
 
 
 @app.get('/users/<string:user>/')
-@moira_query
-@webathena
+@authenticated_moira
 def get_user(user, kerb):
     if user == 'me':
         user = kerb
@@ -73,8 +72,7 @@ def get_user(user, kerb):
 
 
 @app.get('/users/<string:user>/belongings')
-@moira_query
-@webathena
+@authenticated_moira
 def get_user_belongings(user, kerb):
     if user == 'me':
         user = kerb
@@ -83,8 +81,7 @@ def get_user_belongings(user, kerb):
 
 
 @app.get('/users/<string:user>/lists')
-@moira_query
-@webathena
+@authenticated_moira
 def get_user_lists(user, kerb):
     if user == 'me':
         user = kerb
@@ -98,8 +95,7 @@ def get_user_lists(user, kerb):
 
 
 @app.get('/users/<string:user>/tapaccess')
-@moira_query
-@webathena
+@authenticated_moira
 def user_tap_access(user, kerb):
     if user == 'me':
         user = kerb
@@ -108,8 +104,7 @@ def user_tap_access(user, kerb):
 
 
 @app.get('/lists/')
-@moira_query
-@webathena
+@authenticated_moira
 def get_all_lists(kerb):
     if not parse_bool(request.args.get('confirm', False)):
         return {
@@ -125,8 +120,7 @@ def get_all_lists(kerb):
 
 
 @app.post('/lists/<string:list_name>/')
-@moira_query
-@webathena
+@authenticated_moira
 def make_list(list_name, kerb):
     # TODO: figure this out
     # First, check if list exists though
@@ -134,8 +128,7 @@ def make_list(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/')
-@moira_query
-@webathena
+@authenticated_moira
 def get_list(list_name, kerb):
     res = moira.query('get_list_info', list_name)[0]
     return {
@@ -166,8 +159,7 @@ def get_list(list_name, kerb):
 
 
 @app.patch('/lists/<string:list_name>/')
-@moira_query
-@webathena
+@authenticated_moira
 @plaintext
 def update_list(list_name, kerb):
     current_attributes = moira.query('get_list_info', list_name)[0]
@@ -215,8 +207,7 @@ def update_list(list_name, kerb):
 
 
 @app.delete('/lists/<string:list_name>/')
-@moira_query
-@webathena
+@authenticated_moira
 @plaintext
 def delete_list(list_name, kerb):
     moira.query('delete_list', list_name)
@@ -224,8 +215,7 @@ def delete_list(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/members/')
-@moira_query
-@webathena
+@authenticated_moira
 def get_list_members(list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', False))
     query = 'get_end_members_of_list' if recurse else 'get_members_of_list'
@@ -253,8 +243,7 @@ def get_list_members(list_name, kerb):
 
 
 @app.put('/lists/<string:list_name>/members/<string:member_name>')
-@moira_query
-@webathena
+@authenticated_moira
 def add_member(list_name, member_name, kerb):
     if member_name == 'me':
         member_name = kerb
@@ -264,8 +253,7 @@ def add_member(list_name, member_name, kerb):
 
 
 @app.delete('/lists/<string:list_name>/members/<string:member_name>')
-@moira_query
-@webathena
+@authenticated_moira
 @plaintext
 def remove_member(list_name, member_name, kerb):
     if member_name == 'me':
@@ -276,16 +264,14 @@ def remove_member(list_name, member_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/belongings')
-@moira_query
-@webathena
+@authenticated_moira
 def get_list_belongings(list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', True))
     return get_ace_use(conditional_recursive_type('LIST', recurse), list_name)
 
 
 @app.get('/lists/<string:list_name>/lists')
-@moira_query
-@webathena
+@authenticated_moira
 def get_list_lists(list_name, kerb):
     include_properties = request.args.get('include_properties', False)
     recurse = request.args.get('recurse', True)
@@ -297,8 +283,7 @@ def get_list_lists(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/owner')
-@moira_query
-@webathena
+@authenticated_moira
 def get_list_admin(list_name, kerb):
     res = moira.query('get_list_info', list_name)[0]
     return {
@@ -308,8 +293,7 @@ def get_list_admin(list_name, kerb):
 
 
 @app.put('/lists/<string:list_name>/owner')
-@moira_query
-@webathena
+@authenticated_moira
 @plaintext
 def set_list_admin(list_name, kerb):
     attributes = create_update_list_input(list_name)
@@ -320,8 +304,7 @@ def set_list_admin(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/membership_admin')
-@moira_query
-@webathena
+@authenticated_moira
 def get_list_membership_admin(list_name, kerb):
     res = moira.query('get_list_info', list_name)[0]
     if res['memace_type'] == 'NONE':
@@ -334,8 +317,7 @@ def get_list_membership_admin(list_name, kerb):
     }
 
 @app.put('/lists/<string:list_name>/membership_admin')
-@moira_query
-@webathena
+@authenticated_moira
 @plaintext
 def set_list_membership_admin(list_name, kerb):
     attributes = create_update_list_input(list_name)
@@ -346,8 +328,7 @@ def set_list_membership_admin(list_name, kerb):
 
 
 @app.delete('/lists/<string:list_name>/membership_admin')
-@moira_query
-@webathena
+@authenticated_moira
 @plaintext
 def delete_list_membership_admin(list_name, kerb):
     attributes = create_update_list_input(list_name)
@@ -361,6 +342,7 @@ def delete_list_membership_admin(list_name, kerb):
 # TODO: don't do this in production
 if __name__ == '__main__':
     app.debug = True
+    # app.run(host="0.0.0.0", port=8000)
     app.run()
 else:
     from werkzeug.middleware.proxy_fix import ProxyFix
