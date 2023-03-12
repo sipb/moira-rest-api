@@ -19,7 +19,7 @@ def home():
 @app.get('/klist')
 @webathena
 @plaintext
-def test():
+def test(kerb):
     result = subprocess.run('klist', stdout=subprocess.PIPE)
     return result.stdout.decode()
 
