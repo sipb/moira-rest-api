@@ -45,8 +45,8 @@ def whoami(kerb):
 
 
 @app.get('/users/<string:user>/')
-@webathena
 @moira_query
+@webathena
 def get_user(user, kerb):
     if user == 'me':
         user = kerb
@@ -73,8 +73,8 @@ def get_user(user, kerb):
 
 
 @app.get('/users/<string:user>/belongings')
-@webathena
 @moira_query
+@webathena
 def get_user_belongings(user, kerb):
     if user == 'me':
         user = kerb
@@ -83,8 +83,8 @@ def get_user_belongings(user, kerb):
 
 
 @app.get('/users/<string:user>/lists')
-@webathena
 @moira_query
+@webathena
 def get_user_lists(user, kerb):
     if user == 'me':
         user = kerb
@@ -98,8 +98,8 @@ def get_user_lists(user, kerb):
 
 
 @app.get('/users/<string:user>/tapaccess')
-@webathena
 @moira_query
+@webathena
 def user_tap_access(user, kerb):
     if user == 'me':
         user = kerb
@@ -108,8 +108,8 @@ def user_tap_access(user, kerb):
 
 
 @app.get('/lists/')
-@webathena
 @moira_query
+@webathena
 def get_all_lists(kerb):
     if not parse_bool(request.args.get('confirm', False)):
         return {
@@ -125,8 +125,8 @@ def get_all_lists(kerb):
 
 
 @app.post('/lists/<string:list_name>/')
-@webathena
 @moira_query
+@webathena
 def make_list(list_name, kerb):
     # TODO: figure this out
     # First, check if list exists though
@@ -134,8 +134,8 @@ def make_list(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/')
-@webathena
 @moira_query
+@webathena
 def get_list(list_name, kerb):
     res = moira.query('get_list_info', list_name)[0]
     return {
@@ -166,8 +166,8 @@ def get_list(list_name, kerb):
 
 
 @app.patch('/lists/<string:list_name>/')
-@webathena
 @moira_query
+@webathena
 @plaintext
 def update_list(list_name, kerb):
     current_attributes = moira.query('get_list_info', list_name)[0]
@@ -215,8 +215,8 @@ def update_list(list_name, kerb):
 
 
 @app.delete('/lists/<string:list_name>/')
-@webathena
 @moira_query
+@webathena
 @plaintext
 def delete_list(list_name, kerb):
     moira.query('delete_list', list_name)
@@ -224,8 +224,8 @@ def delete_list(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/members/')
-@webathena
 @moira_query
+@webathena
 def get_list_members(list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', False))
     query = 'get_end_members_of_list' if recurse else 'get_members_of_list'
@@ -253,8 +253,8 @@ def get_list_members(list_name, kerb):
 
 
 @app.put('/lists/<string:list_name>/members/<string:member_name>')
-@webathena
 @moira_query
+@webathena
 def add_member(list_name, member_name, kerb):
     if member_name == 'me':
         member_name = kerb
@@ -264,8 +264,8 @@ def add_member(list_name, member_name, kerb):
 
 
 @app.delete('/lists/<string:list_name>/members/<string:member_name>')
-@webathena
 @moira_query
+@webathena
 @plaintext
 def remove_member(list_name, member_name, kerb):
     if member_name == 'me':
@@ -276,16 +276,16 @@ def remove_member(list_name, member_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/belongings')
-@webathena
 @moira_query
+@webathena
 def get_list_belongings(list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', True))
     return get_ace_use(conditional_recursive_type('LIST', recurse), list_name)
 
 
 @app.get('/lists/<string:list_name>/lists')
-@webathena
 @moira_query
+@webathena
 def get_list_lists(list_name, kerb):
     include_properties = request.args.get('include_properties', False)
     recurse = request.args.get('recurse', True)
@@ -297,8 +297,8 @@ def get_list_lists(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/owner')
-@webathena
 @moira_query
+@webathena
 def get_list_admin(list_name, kerb):
     res = moira.query('get_list_info', list_name)[0]
     return {
@@ -308,8 +308,8 @@ def get_list_admin(list_name, kerb):
 
 
 @app.put('/lists/<string:list_name>/owner')
-@webathena
 @moira_query
+@webathena
 @plaintext
 def set_list_admin(list_name, kerb):
     attributes = create_update_list_input(list_name)
@@ -320,8 +320,8 @@ def set_list_admin(list_name, kerb):
 
 
 @app.get('/lists/<string:list_name>/membership_admin')
-@webathena
 @moira_query
+@webathena
 def get_list_membership_admin(list_name, kerb):
     res = moira.query('get_list_info', list_name)[0]
     if res['memace_type'] == 'NONE':
@@ -334,8 +334,8 @@ def get_list_membership_admin(list_name, kerb):
     }
 
 @app.put('/lists/<string:list_name>/membership_admin')
-@webathena
 @moira_query
+@webathena
 @plaintext
 def set_list_membership_admin(list_name, kerb):
     attributes = create_update_list_input(list_name)
@@ -346,8 +346,8 @@ def set_list_membership_admin(list_name, kerb):
 
 
 @app.delete('/lists/<string:list_name>/membership_admin')
-@webathena
 @moira_query
+@webathena
 @plaintext
 def delete_list_membership_admin(list_name, kerb):
     attributes = create_update_list_input(list_name)
