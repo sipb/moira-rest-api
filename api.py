@@ -20,7 +20,7 @@ def home():
 @webathena
 @plaintext
 def test(kerb):
-    result = subprocess.run('klist', stdout=subprocess.PIPE)
+    result = subprocess.run(['klist', '-f'], stdout=subprocess.PIPE)
     return result.stdout.decode()
 
 @app.errorhandler(404)

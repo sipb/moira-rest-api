@@ -171,7 +171,7 @@ if __name__ == '__main__':
 
         # Make sure ticket works
         username = cred['cname']['nameString'][0]
-        subprocess.call(['klist'])
+        subprocess.call(['klist', '-f'])
 
         # Make sure Moira works
         moira.connect()
