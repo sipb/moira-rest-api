@@ -34,6 +34,22 @@ def parse_bool(param):
     else:
         raise Exception(f'invalid boolean: {param}')
 
+
+"""
+Parses a mailing list entry dict
+into the names we want for our API
+"""
+def parse_list_dict(entry):
+    return {
+        'name': entry['list_name'],
+        'active': parse_bool(entry['active']),
+        'public': parse_bool(entry['publicflg']),
+        'hidden': parse_bool(entry['hidden']),
+        'is_mailing_list': parse_bool(entry['maillist']),
+        'is_afs_group': parse_bool(entry['grouplist']),
+    }
+
+
 """
 Parse a parameter as a bool-like "1" or "0"
 for use in Moira queries
