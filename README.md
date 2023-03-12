@@ -15,7 +15,7 @@ All requests must be authenticated. There are two ways to do this:
 
 If any of the functions returns an error, the output will be the following:
 
-```json
+```ts
 {
     "code": int | undefined, // error code, only if the error is a moira error
     "name": string | undefined, // short error name
@@ -45,7 +45,7 @@ No input taken.
 
 Returns:
 
-```json
+```ts
 {
     "name": string,
     "kerb": string,
@@ -68,7 +68,7 @@ With normal Moira privileges, `{name}` can only be your own username or the spec
 
 Output:
 
-```json
+```ts
 [
     {
         "type": "list" | "machine" | "filesys" | ... ,
@@ -98,7 +98,7 @@ If `include_properties` is `false`, returns an array of strings representing the
 
 If `include_properties` is `true`, returns an array of list objects:
 
-```json
+```ts
 {
     "name": string, // name of the list
     "active": bool, // whether the list is active
@@ -152,7 +152,7 @@ Gets the property of a specific list.
 
 Output:
 
-```json
+```ts
 {
     "name": string, // name of the list
     "description": string, // description of the list
@@ -221,7 +221,7 @@ Errors:
 
 Output:
 
-```json
+```ts
 {
     "users": [
         // list of users in the mailing list
