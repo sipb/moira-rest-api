@@ -159,6 +159,7 @@ if __name__ == '__main__':
     import subprocess
     import os
     import json
+    import moira
 
     with open('private-test-ticket.json', 'rb') as f:
         cred = json.loads(f.read().decode())
@@ -168,4 +169,12 @@ if __name__ == '__main__':
         ccache.flush()
         env = dict(os.environ)
         env['KRB5CCNAME'] = ccache.name
+
+        # Make sure ticket works
+        username = cred['cname']['nameString'][0]
         subprocess.call(['klist'], env=env)
+
+        # Make sure Moira works
+        moira.connect()
+        moira.auth('python3')
+        print(moira.query('get_user_by_login', username)[0])
