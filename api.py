@@ -370,7 +370,14 @@ def delete_list_membership_admin(list_name, kerb):
     moira.query('update_list', **attributes)
     return 'success'
 
+
+
 # TODO: don't do this in production
-app.debug = True
 if __name__ == '__main__':
+    app.debug = True
     app.run()
+else:
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+    )
