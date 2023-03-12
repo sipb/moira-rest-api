@@ -164,7 +164,6 @@ if __name__ == '__main__':
         cred = json.loads(f.read().decode())
 
     with NamedTemporaryFile(prefix='ccache_') as ccache:
-        print(ccache.name)
         ccache.write(make_ccache(cred))
         ccache.flush()
         env = dict(os.environ)
