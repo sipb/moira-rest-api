@@ -71,7 +71,7 @@ def webathena(func):
             with NamedTemporaryFile(prefix='ccache_') as ccache:
                 try:
                     ccache.write(make_ccache(cred))
-                    kerb = cred['cname']['nameString']
+                    kerb = cred['cname']['nameString'][0]
                 except KeyError as e:
                     return {'error': {'description': f'Malformed credential, missing key {e.args[0]}'}}, 400
                 ccache.flush()
