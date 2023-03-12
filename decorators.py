@@ -76,7 +76,11 @@ def webathena(func):
                     return {'error': {'description': f'Malformed credential, missing key {e.args[0]}'}}, 400
                 ccache.flush()
                 os.environ['KRB5CCNAME'] = ccache.name
-                return func(*args, **kwargs, kerb=kerb)
+                response = func(*args, **kwargs, kerb=kerb)
+                
+                # Make sure to unset the environment variable, just in case
+                del os.environ['KRB5CCNAME']
+                return response
     return wrapped
 
 
