@@ -9,35 +9,38 @@ import moira
 import functools
 import inspect
 
-"""
-Decorator that makes endpoint return plaintext instead of HTML
-"""
+
 def plaintext(func):
+    """
+    Decorator that makes endpoint return plaintext instead of HTML
+    """
+    
     # https://realpython.com/primer-on-python-decorators/#who-are-you-really
     # Necessary for Flask
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
         orig_response = func(*args, **kwargs)
+        # https://stackoverflow.com/questions/57296472/how-to-return-plain-text-from-flask-endpoint-needed-by-prometheus
         response = make_response(orig_response, 200)
         response.mimetype = 'text/plain'
-        # https://stackoverflow.com/questions/57296472/how-to-return-plain-text-from-flask-endpoint-needed-by-prometheus
         return response
     
     return wrapped
 
 
-"""
-Decorator that makes sure a webathena token is passed to the request.
-API requests accept two forms of passing it:
-
-* "Authorization: webathena [base64-encoded JSON]" header
-* "webathena" GET parameter (also base64-encoded JSON)
-
-The username of the authenticated user is passed as a name parameter `kerb`
-
-Pattern inspired by mailto code.
-"""
 def webathena(func):
+    """
+    Decorator that makes sure a webathena token is passed to the request.
+    API requests accept two forms of passing it:
+
+    * "Authorization: webathena [base64-encoded JSON]" header
+    * "webathena" GET parameter (also base64-encoded JSON)
+
+    The username of the authenticated user is passed as a name parameter `kerb`
+
+    Pattern inspired by mailto code.
+    """
+
     def get_webathena_json() -> dict | None:
         if 'Authorization' in request.headers:
             prefix, auth = request.headers['Authorization'].split(' ')
@@ -102,8 +105,6 @@ def moira_query(func):
 
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        # fname = inspect.currentframe().f_code.co_name
-        fname = inspect.stack()[0][3]
         moira.connect()
         moira.auth(CLIENT_NAME)
         try:
