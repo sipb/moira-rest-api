@@ -170,14 +170,18 @@ if __name__ == '__main__':
             ccache.flush()
             os.environ['KRB5CCNAME'] = ccache.name
 
-            # Make sure ticket works
+            # Make sure ticket works (YES)
             username = cred['cname']['nameString'][0]
             subprocess.call(['klist', '-f'])
 
-            # Make sure Moira works
+            # Make sure qy works (YES)
+            subprocess.call(['qy', 'get_user_by_login', username])
+
+            # Make sure Moira bindings work (NO!)
             moira.connect()
             moira.auth('python3')
             print(moira.query('get_user_by_login', username)[0])
+            moira.disconnect()
 
             # Delete environment variable
             del os.environ['KRB5CCNAME']
