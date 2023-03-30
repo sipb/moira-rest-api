@@ -14,7 +14,7 @@ app = Flask(__name__)
 @app.get('/')
 @plaintext
 def home():
-    return 'Welcome to the Moira API! This is work-in-progress.\nFor documentation see: https://github.com/gabrc52/webmoira2/tree/main/backend'
+    return 'Welcome to the Moira API!\nFor documentation see: https://github.com/gabrc52/moira-rest-api/'
 
 @app.get('/klist')
 @webathena
