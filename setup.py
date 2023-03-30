@@ -7,7 +7,7 @@ setup(
     author="Gabriel Rodríguez",
     author_email="rgabriel@mit.edu",
     license="MIT",
-    py_modules=["api", "decorators", "make_ccache", "util"],
+    py_modules=["api", "decorators", "make_ccache", "util", "moira_query"],
     # TODO: might the name(s) conflict?
     # In theory we should only need to export one (api right now)
     # But we need to `import decorators`
