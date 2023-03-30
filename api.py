@@ -103,6 +103,47 @@ def user_tap_access(user, kerb):
     return [entry['list_name'] for entry in res]
 
 
+@app.get('/users/<string:user>/finger')
+@authenticated_moira
+def user_get_finger(user, kerb):
+    if user == 'me':
+        user = kerb
+    return moira.query('get_finger_by_login', user)[0]
+
+
+@app.patch('/users/<string:user>/finger')
+@authenticated_moira
+def user_change_finger(user, kerb):
+    if user == 'me':
+        user = kerb
+
+    current = moira.query('get_finger_by_login', user)[0]
+
+    def get_attribute(attr):
+        """
+        Gets the argument from the request, if passed,
+        otherwise keep it unchanged (from current finger)
+        """
+        if attr in request.json:
+            return request.json[attr]
+        else:
+            return current[attr]
+    
+    moira.query(
+        'update_finger_by_login',
+        login=user,
+        fullname=get_attribute('fullname'),
+        nickname=get_attribute('nickname'),
+        home_addr=get_attribute('home_addr'),
+        home_phone=get_attribute('home_phone'),
+        office_addr=get_attribute('office_addr'),
+        office_phone=get_attribute('office_phone'),
+        department=get_attribute('department'),
+        affiliation=get_attribute('affiliation'),
+    )
+    return 'success'
+
+
 @app.get('/lists/')
 @authenticated_moira
 def get_all_lists(kerb):

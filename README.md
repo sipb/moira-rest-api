@@ -431,4 +431,31 @@ TODO: define spec and implement
 
 ## Finger
 
-TODO: define spec and implement
+### Get finger
+
+`GET /users/me/finger`
+
+Get my `finger` info, kept just like on the Moira query. Returns a single dictionary whose keys and values are strings. Values may be anything, 
+
+The returned keys are:
+
+* `affiliation`: Your "affiliation". For undergrads it seems to be the class year.
+* `department`: Your department, seems to be the course number.
+* `fullname`: Full name, which may or may not be the WebSIS name. This backend will be used to make a tool to let people change their name, while we try to get IS&T to sort that out. Clients must not display this other than for making ways to let people see and change finger info, otherwise you must use the name in `/users/me`
+* `home_addr`: Home address, which seems to be synced from housing (wow! Even with StarREZ!)
+* `home_phone`: Empty string in the case for undergrads
+* `login`: Kerb/username
+* `modby`: who modified finger last
+* `modtime`: when this finger was last modified, in format "dd-mmm-yyyy hh:mm:ss"
+* `modwith`: what tool or script finger was last modified with
+* `nickname`: nickname?
+* `office_addr`: office address
+* `office_phone`: office phone
+
+### Update finger
+
+Input should be a JSON with any subset of the following parameters: `fullname`, `nickname`, `home_addr`, `home_phone`, `office_addr`, `office_phone`, `department`, `affiliation`
+
+If they are ommitted or set to null, it means those attributes should not be modified.
+
+Only pass as input those parameters you wish to modify.
