@@ -152,36 +152,3 @@ def make_ccache(cred: dict) -> bytes:
     out += _ccache_principal(cred["cname"], cred["crealm"])
     out += _ccache_credential(cred)
     return out
-
-
-# Manual testing
-if __name__ == '__main__':
-    import subprocess
-    import os
-    import json
-    import moira
-
-    with open('private-test-ticket.json', 'rb') as f:
-        cred = json.loads(f.read().decode())
-
-    for i in range(2):
-        with NamedTemporaryFile(prefix='ccache_') as ccache:
-            ccache.write(make_ccache(cred))
-            ccache.flush()
-            os.environ['KRB5CCNAME'] = ccache.name
-
-            # Make sure ticket works (YES)
-            username = cred['cname']['nameString'][0]
-            subprocess.call(['klist', '-f'])
-
-            # Make sure qy works (YES)
-            subprocess.call(['qy', 'get_user_by_login', username])
-
-            # Make sure Moira bindings work (NO!)
-            moira.connect()
-            moira.auth('python3')
-            print(moira.query('get_user_by_login', username)[0])
-            moira.disconnect()
-
-            # Delete environment variable
-            del os.environ['KRB5CCNAME']
