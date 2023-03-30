@@ -3,8 +3,10 @@ from flask import Flask, request, Response
 from decorators import webathena, plaintext, authenticated_moira
 from moira_query import moira_query
 from util import *
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app) # to actually use the API from JavaScript
 
 # I wanted to separate this into multiple files, but it seems non-trivial: 
 # https://www.reddit.com/r/flask/comments/m3kp1i/splitting_flask_app_into_multiple_files/
@@ -380,7 +382,7 @@ def delete_list_membership_admin(list_name, kerb):
 
 
 
-app.debug = True
+app.debug = False
 if __name__ == '__main__':
     # app.run(host="0.0.0.0", port=8000)
     app.run()
