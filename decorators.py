@@ -7,7 +7,6 @@ from make_ccache import make_ccache
 import os
 import moira
 import functools
-import inspect
 
 
 def plaintext(func):
@@ -87,29 +86,16 @@ _moira_errors_inverse = {v:k for k,v in moira.errors().items()}
 def get_moira_error_name(code):
     return _moira_errors_inverse[code]
 
-def moira_query(func):
+def moira_errors(func):
     """
-    A decorator that opens an authenticated Moira session before the wrapped
-    function is executed.
-
-    Afterwards, it parses errors and returns them according to the API spec
-
-    With this decorator combined with @webathena, all you need to do to define
-    an API method is to call moira.query with the desired query and then parse
-    the output if needed
-
-    Initially taken from mailto code.
+    A decorator that parses Moira errors and returns them
+    according to the API spec (as a Flask result, status code tuple)
     """
-    # webmoira2 is one character too long
-    CLIENT_NAME = 'python3'
 
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        moira.connect()
-        moira.auth(CLIENT_NAME)
         try:
             response = func(*args, **kwargs)
-            moira.disconnect()
             return response
         except moira.MoiraException as e:
             error_code = e.code
@@ -145,4 +131,4 @@ def authenticated_moira(func):
     seems inconsistent, and you need to have tickets in order to 
     authenticate with moira
     """
-    return webathena(moira_query(func))
+    return webathena(moira_errors(func))
