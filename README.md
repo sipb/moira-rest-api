@@ -454,6 +454,8 @@ The returned keys are:
 
 ### Update finger
 
+`PATCH /users/me/finger`
+
 Input should be a JSON with any subset of the following parameters: `fullname`, `nickname`, `home_addr`, `home_phone`, `office_addr`, `office_phone`, `department`, `affiliation`
 
 If they are ommitted or set to null, it means those attributes should not be modified.
