@@ -1,12 +1,6 @@
-# Backend
+# Moira REST API
 
-The backend will be a Flask Python API around the Python bindings for the Moira C API.
-
-This could also be a general-purpose API around Moira calls (not necessarily mailing-list related ones), so it should outgrow this repo soon enough.
-
-TODO: eventually handle mailman lists
-
-TODO: interesting unused feature: tagging members of list. it could be implemented here as a comments field in the existing methods
+This is an HTTP API around Moira (and possibly Mailman in the future). 
 
 ## Webathena authentication
 
