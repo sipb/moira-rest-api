@@ -99,7 +99,8 @@ def moira_errors(func):
             return response
         except moira.MoiraException as e:
             error_code = e.code
-            error_message = e.message
+            # TODO: re-contribute e.message to the moira api
+            error_message = e.args[1].decode()
             error_name = get_moira_error_name(error_code)
             status_code = 500
             
