@@ -47,6 +47,8 @@ Clients should use `GET /users/me/` instead.
 
 `GET /users/me/`
 
+**Note the trailing slash.** 
+
 If `me` is used in place of `{user}`, it means the person who's authenticated to the API
 
 No input taken.
@@ -80,7 +82,7 @@ With normal Moira privileges, `{name}` can only be your own username or the spec
 
 Get parameters:
 
-* `recurse`: bool. Whether to include objects this user can administer because they are in a list that can administer it (and so on), as opposed to a direct ownership.
+* `recurse`: bool. Default true. Whether to include objects this user can administer because they are in a list that can administer it (and so on), as opposed to a direct ownership.
 
 Output:
 
@@ -108,7 +110,7 @@ Get parameters:
 
 * `include_properties`: bool. Defaults to false. Whether to return properties of the mailing list apart from just the names
 
-* `recurse`: bool. Whether to include the lists a user is in through other lists rather than just directly.
+* `recurse`: bool. Defaults to true. Whether to include the lists a user is in through other lists rather than just directly.
 
 Output:
 
@@ -146,6 +148,8 @@ Some info on list properties: http://kb.mit.edu/confluence/display/istcontrib/Mo
 
 `GET /lists/`
 
+**Note the trailing slash**
+
 GET parameters:
 
 * `active`: Must be either `true`, `false`, or `dontcare`. Default `true`.
@@ -161,7 +165,9 @@ Array of strings representing the list names
 
 ### Get a list
 
-`GET /lists/{name}`
+`GET /lists/{name}/`
+
+**Note the trailing slash**
 
 Gets the property of a specific list.
 
@@ -261,11 +267,13 @@ Errors:
 
 ### Get members of list
 
-`GET /lists/{name}/members`
+`GET /lists/{name}/members/`
+
+**Note the trailing slash**
 
 GET parameters:
 
-* `recurse`: Whether to go into the sublists and return their members instead of just a shallow representation.
+* `recurse`: Whether to go into the sublists and return their members instead of just a shallow representation. Defaults to false.
 
 Output:
 
@@ -332,7 +340,7 @@ See documentation for `GET /users/{name}/belongings` -- same output
 
 Get parameters:
 
-* `recurse`: bool. Whether to include objects this list can administer because it is in a list that can administer it (and so on), as opposed to a direct ownership.
+* `recurse`: bool. Whether to include objects this list can administer because it is in a list that can administer it (and so on), as opposed to a direct ownership. Defaults to true.
 
 Output:
 
