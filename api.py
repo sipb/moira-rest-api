@@ -75,6 +75,7 @@ def get_user(user, kerb):
 
 @app.get('/users/<string:user>/belongings')
 @authenticated_moira
+@jsoned
 def get_user_belongings(user, kerb):
     if user == 'me':
         user = kerb
@@ -311,6 +312,7 @@ def remove_member(list_name, member_name, kerb):
 
 @app.get('/lists/<string:list_name>/belongings')
 @authenticated_moira
+@jsoned
 def get_list_belongings(list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', True))
     return get_ace_use(conditional_recursive_type('LIST', recurse), list_name)
