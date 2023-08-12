@@ -27,6 +27,22 @@ def plaintext(func):
     return wrapped
 
 
+def jsoned(func):
+    """
+    Decorator that makes endpoint return JSON
+    """
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        orig_response = func(*args, **kwargs)
+        json_response = orig_response \
+            if isinstance(orig_response, str) or isinstance(orig_response, bytes) \
+            else json.dumps(orig_response)
+        response = make_response(json_response, 200)
+        response.mimetype = 'application/json'
+        return response
+    return wrapped
+
+
 def webathena(func):
     """
     Decorator that makes sure a webathena token is passed to the request.
@@ -84,7 +100,7 @@ def webathena(func):
 
 _moira_errors_inverse = {v:k for k,v in moira.errors().items()}
 def get_moira_error_name(code):
-    return _moira_errors_inverse[code]
+    return _moira_errors_inverse.get(code) or 'unknown error'
 
 def moira_errors(func):
     """

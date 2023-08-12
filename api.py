@@ -1,6 +1,6 @@
 import subprocess
 from flask import Flask, request, Response
-from decorators import webathena, plaintext, authenticated_moira
+from decorators import jsoned, webathena, plaintext, authenticated_moira
 from moira_query import moira_query
 from util import *
 from flask_cors import CORS
@@ -84,6 +84,7 @@ def get_user_belongings(user, kerb):
 
 @app.get('/users/<string:user>/lists')
 @authenticated_moira
+@jsoned
 def get_user_lists(user, kerb):
     if user == 'me':
         user = kerb
@@ -98,6 +99,7 @@ def get_user_lists(user, kerb):
 
 @app.get('/users/<string:user>/tapaccess')
 @authenticated_moira
+@jsoned
 def user_tap_access(user, kerb):
     if user == 'me':
         user = kerb
@@ -148,6 +150,7 @@ def user_change_finger(user, kerb):
 
 @app.get('/lists/')
 @authenticated_moira
+@jsoned
 def get_all_lists(kerb):
     if not parse_bool(request.args.get('confirm', False)):
         return {
@@ -315,6 +318,7 @@ def get_list_belongings(list_name, kerb):
 
 @app.get('/lists/<string:list_name>/lists')
 @authenticated_moira
+@jsoned
 def get_list_lists(list_name, kerb):
     include_properties = request.args.get('include_properties', False)
     recurse = request.args.get('recurse', True)
@@ -381,8 +385,7 @@ def delete_list_membership_admin(list_name, kerb):
     return 'success'
 
 
-
-app.debug = False
+app.debug = True
 if __name__ == '__main__':
     # app.run(host="0.0.0.0", port=8000)
     app.run()
