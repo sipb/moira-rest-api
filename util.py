@@ -9,7 +9,7 @@ def get_ace_use(ace_type, name):
     res = moira_query('get_ace_use', ace_type, name)
     return [
         {
-            'type': entry['use_type'],
+            'type': entry['use_type'].lower(),
             'name': entry['use_name'],
         }
         for entry in res
