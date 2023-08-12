@@ -1,4 +1,4 @@
-import moira
+from moira_query import moira_query
 
 """
 Several utilities (i.e. helper functions) for use
@@ -6,7 +6,7 @@ in the Flask Moira API
 """
 
 def get_ace_use(ace_type, name):
-    res = moira.query('get_ace_use', ace_type, name)
+    res = moira_query('get_ace_use', ace_type, name)
     return [
         {
             'type': entry['use_type'],
@@ -91,7 +91,7 @@ to update_list, it should be a no-op.
 """
 def create_update_list_input(list_name):
     # Get current attributes
-    attributes = moira.query('get_list_info', list_name)[0]
+    attributes = moira_query('get_list_info', list_name)[0]
     # Delete modified attributes
     del attributes['modtime']
     del attributes['modby']
