@@ -93,7 +93,9 @@ def webathena(func):
                 response = func(*args, **kwargs, kerb=kerb)
 
                 # Make sure to unset the environment variable, just in case
-                del os.environ['KRB5CCNAME']
+                # Only if it exists that is
+                if 'KRB5CCNAME' in os.environ:
+                    del os.environ['KRB5CCNAME']
                 return response
     return wrapped
 
