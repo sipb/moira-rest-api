@@ -90,7 +90,7 @@ def get_user_lists(user, kerb):
     if user == 'me':
         user = kerb
     include_properties = request.args.get('include_properties', False)
-    recurse = request.args.get('recurse', True)
+    recurse = parse_bool(request.args.get('recurse', True))
     res = moira_query('get_lists_of_member', conditional_recursive_type('USER', recurse), user)
     if include_properties:
         return [parse_list_dict(entry) for entry in res]
