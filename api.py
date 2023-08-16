@@ -89,7 +89,7 @@ def get_user_belongings(user, kerb):
 def get_user_lists(user, kerb):
     if user == 'me':
         user = kerb
-    include_properties = request.args.get('include_properties', False)
+    include_properties = parse_bool(request.args.get('include_properties', False))
     recurse = parse_bool(request.args.get('recurse', True))
     res = moira_query('get_lists_of_member', conditional_recursive_type('USER', recurse), user)
     if include_properties:
@@ -322,8 +322,8 @@ def get_list_belongings(list_name, kerb):
 @authenticated_moira
 @jsoned
 def get_list_lists(list_name, kerb):
-    include_properties = request.args.get('include_properties', False)
-    recurse = request.args.get('recurse', True)
+    include_properties = parse_bool(request.args.get('include_properties', False))
+    recurse = parse_bool(request.args.get('recurse', True))
     res = moira_query('get_lists_of_member', conditional_recursive_type('LIST', recurse), list_name)
     if include_properties:
         return [parse_list_dict(entry) for entry in res]
