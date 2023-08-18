@@ -60,11 +60,7 @@ def whoami(kerb):
 def get_user(user, kerb):
     if user == 'me':
         user = kerb
-
-    if user != kerb:
-        # TODO: don't hardcode this and please don't commit it
-        pass
-
+    
     res = moira_query('get_user_by_login', user)
     assert len(res) == 1
     res = res[0]
