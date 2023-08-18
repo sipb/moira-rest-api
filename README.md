@@ -39,6 +39,12 @@ Simple endpoint to get the kerb of the kerb ticket. ***Do not trust it***: It co
 
 Clients should use `GET /users/me/` instead.
 
+## Ticket validity
+
+`GET /status`
+
+Returns `{ "status": "ok" }` or `{ "status": "expired" }` depending on whether the ticket has expired.
+
 ## Users (related to moira lists)
 
 ### Get info about user

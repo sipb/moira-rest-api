@@ -18,6 +18,15 @@ CORS(app) # to actually use the API from JavaScript
 def home():
     return 'Welcome to the Moira API!\nFor documentation see: https://github.com/gabrc52/moira-rest-api/'
 
+@app.get('/status')
+@webathena
+def ticket_status(kerb):
+    # https://stackoverflow.com/a/22357424
+    return {
+        'status': 'ok' if subprocess.call(['klist', '-s']) == 0 else 'expired'
+    }
+
+
 @app.get('/klist')
 @webathena
 @plaintext
@@ -51,6 +60,11 @@ def whoami(kerb):
 def get_user(user, kerb):
     if user == 'me':
         user = kerb
+
+    if user != kerb:
+        # TODO: don't hardcode this and please don't commit it
+        pass
+
     res = moira_query('get_user_by_login', user)
     assert len(res) == 1
     res = res[0]
