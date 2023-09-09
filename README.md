@@ -9,6 +9,8 @@ All requests must be authenticated. There are two ways to do this:
 * `Authorization: webathena [base64-encoded JSON]` header
 * `webathena` GET parameter (also base64-encoded JSON)
 
+For an example on how to use webathena to get the ticket, see https://github.com/gabrc52/svelte-moira/blob/main/src/lib/webathena.ts
+
 ## Errors
 
 If any of the functions returns an error, the output will be the following:
@@ -212,6 +214,8 @@ Errors:
 Output:
 
 The string "success"
+
+
 
 ### Make a list
 
