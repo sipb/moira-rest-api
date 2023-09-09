@@ -83,6 +83,9 @@ def get_user(user, kerb):
         'class_year': res['class'],
     }
 
+# The following 2 queries are from LDAP
+# TODO: handle more exceptions
+
 @app.get('/users/<string:user>/name')
 @webathena
 @jsoned
@@ -94,6 +97,15 @@ def get_name(user, kerb):
         return {'name': name}
     except LdapNotFoundException as e:
         return {'error': {'description': f'kerb {user} does not exist'}}, 404
+
+@app.get('/lists/<string:list_name>/names')
+@webathena
+@jsoned
+def get_names(list_name, kerb):
+    try:
+        return get_names_in_list(list_name)
+    except LdapNotFoundException as e:
+        return {'error': {'description': f'list {list_name} does not exist'}}, 404
 
 
 @app.get('/users/<string:user>/belongings')
