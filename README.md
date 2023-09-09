@@ -11,6 +11,12 @@ All requests must be authenticated. There are two ways to do this:
 
 For an example on how to use webathena to get the ticket, see https://github.com/gabrc52/svelte-moira/blob/main/src/lib/webathena.ts
 
+You should get tickets for `moira/moira7.mit.edu`
+
+### LDAP notice
+
+Moira does not allow querying users' display names, which is something that WebMoira does provide. To supplement this missing capability, the endpoints `/lists/[list]/names` and `/users/[user]/name` use LDAP to perform those queries. So you should also get tickets that work with `ldap/w92dc1.win.mit.edu@WIN.MIT.EDU` if you wish to use those endpoints.
+
 ## Errors
 
 If any of the functions returns an error, the output will be the following:
@@ -81,6 +87,27 @@ Errors:
 
 * 404: user not found
 * 403: permission denied (if you try to query someone other than yourself)
+
+### Get user display name
+
+**Note: uses LDAP**
+
+`GET /users/{user}/name`
+
+No input taken. Returns only the user's display name.
+
+Returns:
+
+```ts
+{
+    "name": string
+}
+```
+
+Errors:
+
+* 404: user not found
+* 401: kerberos ticket not valid for LDAP
 
 ### Get everything this user can administer
 
@@ -215,7 +242,19 @@ Output:
 
 The string "success"
 
+### Get display names of the members in a list
 
+**Note: uses LDAP**
+
+`GET /lists/{name}/names`
+
+No input taken. Returns a mapping from kerb to display name, in JSON format, where keys are usernames and values are display names.
+
+Errors:
+
+* 404: list does not exist
+* 403: permission denied
+* 401: kerberos ticket not valid for LDAP
 
 ### Make a list
 
