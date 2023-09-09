@@ -2,6 +2,7 @@ import subprocess
 from flask import Flask, request, Response
 from decorators import jsoned, webathena, plaintext, authenticated_moira
 from moira_query import moira_query
+from ldap_queries import get_user_name, get_names_in_list, LdapNotFoundException
 from util import *
 from flask_cors import CORS
 
@@ -81,6 +82,18 @@ def get_user(user, kerb):
         'mit_id': res['clearid'],
         'class_year': res['class'],
     }
+
+@app.get('/users/<string:user>/name')
+@webathena
+@jsoned
+def get_name(user, kerb):
+    if user == 'me':
+        user = kerb
+    try:
+        name = get_user_name(user)
+        return {'name': name}
+    except LdapNotFoundException as e:
+        return {'error': {'description': f'kerb {user} does not exist'}}, 404
 
 
 @app.get('/users/<string:user>/belongings')
@@ -397,8 +410,8 @@ def delete_list_membership_admin(list_name, kerb):
     return 'success'
 
 
-app.debug = True
 if __name__ == '__main__':
+    app.debug = True
     # app.run(host="0.0.0.0", port=8000)
     app.run()
 else:
