@@ -56,6 +56,14 @@ def whoami(kerb):
     return kerb
 
 
+@app.route('/raw_query/<string:query>', methods=['GET', 'POST'])
+@authenticated_moira
+def raw_query(query, kerb):
+    parameters = request.args.getlist('arg')
+    res = moira_query(query, *parameters)
+    return res
+
+
 @app.get('/users/<string:user>/')
 @authenticated_moira
 def get_user(user, kerb):

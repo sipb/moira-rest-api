@@ -53,6 +53,14 @@ Clients should use `GET /users/me/` instead.
 
 Returns `{ "status": "ok" }` or `{ "status": "expired" }` depending on whether the ticket has expired.
 
+## Raw Moira query
+
+`POST /raw_query/{query}/?arg=a&arg=b`
+
+with parameters `a` and `b` (specify according to your needs)
+
+`GET` works as well.
+
 ## Users (related to moira lists)
 
 ### Get info about user
