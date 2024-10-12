@@ -8,6 +8,8 @@ import os
 import moira
 import functools
 
+from moira_query import moira_query_modwith
+
 
 def plaintext(func):
     """
@@ -144,10 +146,34 @@ def moira_errors(func):
     return wrapped
 
 
+# TODO: I can't *wrap* (drum roll) my head around if this decorator should come before or after
+# webathena
+def allow_changing_modwith(func):
+    """
+    A decorator that passes a moira_query as first parameter to the decorated function
+    that will be a moira_query function but with a modified modwith.
+
+    It would use the default modwith of `python3`, unless the `modwith` header is 
+    overriden.
+    """
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        if 'modwith' in request.headers:            
+            modwith = request.headers['modwith']
+        else:
+            modwith = "python3"
+        def moira_query(*args, **kwargs):
+            return moira_query_modwith(modwith, *args, **kwargs)
+        return func(moira_query, *args, **kwargs)
+
+    return wrapped
+
+
 def authenticated_moira(func):
     """
     Decorator that nests both decorators, because Python decorator behavior
     seems inconsistent, and you need to have tickets in order to 
     authenticate with moira
     """
-    return webathena(moira_errors(func))
+    return webathena(moira_errors(allow_changing_modwith(func)))

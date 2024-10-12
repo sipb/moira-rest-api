@@ -1,7 +1,6 @@
 import subprocess
 from flask import Flask, request, Response
 from decorators import jsoned, webathena, plaintext, authenticated_moira
-from moira_query import moira_query
 from util import *
 from flask_cors import CORS
 
@@ -57,7 +56,7 @@ def whoami(kerb):
 
 @app.route('/raw_query/<string:query>', methods=['GET', 'POST'])
 @authenticated_moira
-def raw_query(query, kerb):
+def raw_query(moira_query, query, kerb):
     parameters = request.args.getlist('arg')
     res = moira_query(query, *parameters)
     return res
@@ -65,7 +64,9 @@ def raw_query(query, kerb):
 
 @app.get('/users/<string:user>/')
 @authenticated_moira
-def get_user(user, kerb):
+def get_user(moira_query, user, kerb):
+    print(f"get_user({moira_query=}, {user=}, {kerb=})")
+
     if user == 'me':
         user = kerb
     
@@ -94,7 +95,7 @@ def get_user(user, kerb):
 @app.get('/users/<string:user>/belongings')
 @authenticated_moira
 @jsoned
-def get_user_belongings(user, kerb):
+def get_user_belongings(moira_query, user, kerb):
     if user == 'me':
         user = kerb
     recurse = parse_bool(request.args.get('recurse', True))
@@ -104,7 +105,7 @@ def get_user_belongings(user, kerb):
 @app.get('/users/<string:user>/lists')
 @authenticated_moira
 @jsoned
-def get_user_lists(user, kerb):
+def get_user_lists(moira_query, user, kerb):
     if user == 'me':
         user = kerb
     include_properties = parse_bool(request.args.get('include_properties', False))
@@ -119,7 +120,7 @@ def get_user_lists(user, kerb):
 @app.get('/users/<string:user>/tapaccess')
 @authenticated_moira
 @jsoned
-def user_tap_access(user, kerb):
+def user_tap_access(moira_query, user, kerb):
     if user == 'me':
         user = kerb
     res = moira_query('get_pacs_lists_of_member', 'RUSER', user)
@@ -128,7 +129,7 @@ def user_tap_access(user, kerb):
 
 @app.get('/users/<string:user>/finger')
 @authenticated_moira
-def user_get_finger(user, kerb):
+def user_get_finger(moira_query, user, kerb):
     if user == 'me':
         user = kerb
     return moira_query('get_finger_by_login', user)[0]
@@ -136,7 +137,7 @@ def user_get_finger(user, kerb):
 
 @app.patch('/users/<string:user>/finger')
 @authenticated_moira
-def user_change_finger(user, kerb):
+def user_change_finger(moira_query, user, kerb):
     if user == 'me':
         user = kerb
 
@@ -170,7 +171,7 @@ def user_change_finger(user, kerb):
 @app.get('/lists/')
 @authenticated_moira
 @jsoned
-def get_all_lists(kerb):
+def get_all_lists(moira_query, kerb):
     if not parse_bool(request.args.get('confirm', False)):
         return {
             'description': 'You must set confirm to true to run this query.',
@@ -186,7 +187,7 @@ def get_all_lists(kerb):
 
 @app.post('/lists/<string:list_name>/')
 @authenticated_moira
-def make_list(list_name, kerb):
+def make_list(moira_query, list_name, kerb):
     # TODO: figure this out
     # First, check if list exists though
     return {'description': 'Not implemented'}, 401
@@ -194,7 +195,7 @@ def make_list(list_name, kerb):
 
 @app.get('/lists/<string:list_name>/')
 @authenticated_moira
-def get_list(list_name, kerb):
+def get_list(moira_query, list_name, kerb):
     res = moira_query('get_list_info', list_name)[0]
     return {
         'name': res['name'],
@@ -226,7 +227,7 @@ def get_list(list_name, kerb):
 @app.patch('/lists/<string:list_name>/')
 @authenticated_moira
 @plaintext
-def update_list(list_name, kerb):
+def update_list(moira_query, list_name, kerb):
     current_attributes = moira_query('get_list_info', list_name)[0]
 
     """
@@ -274,14 +275,14 @@ def update_list(list_name, kerb):
 @app.delete('/lists/<string:list_name>/')
 @authenticated_moira
 @plaintext
-def delete_list(list_name, kerb):
+def delete_list(moira_query, list_name, kerb):
     moira_query('delete_list', list_name)
     return 'success'
 
 
 @app.get('/lists/<string:list_name>/members/')
 @authenticated_moira
-def get_list_members(list_name, kerb):
+def get_list_members(moira_query, list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', False))
     query = 'get_end_members_of_list' if recurse else 'get_members_of_list'
     res = moira_query(query, list_name)
@@ -309,7 +310,7 @@ def get_list_members(list_name, kerb):
 
 @app.put('/lists/<string:list_name>/members/<string:member_name>')
 @authenticated_moira
-def add_member(list_name, member_name, kerb):
+def add_member(moira_query, list_name, member_name, kerb):
     if member_name == 'me':
         member_name = kerb
     member_type = serialize_member_type(request.args.get('type', 'user'))
@@ -320,7 +321,7 @@ def add_member(list_name, member_name, kerb):
 @app.delete('/lists/<string:list_name>/members/<string:member_name>')
 @authenticated_moira
 @plaintext
-def remove_member(list_name, member_name, kerb):
+def remove_member(moira_query, list_name, member_name, kerb):
     if member_name == 'me':
         member_name = kerb
     member_type = serialize_member_type(request.args.get('type', 'user'))
@@ -331,7 +332,7 @@ def remove_member(list_name, member_name, kerb):
 @app.get('/lists/<string:list_name>/belongings')
 @authenticated_moira
 @jsoned
-def get_list_belongings(list_name, kerb):
+def get_list_belongings(moira_query, list_name, kerb):
     recurse = parse_bool(request.args.get('recurse', True))
     return get_ace_use(conditional_recursive_type('LIST', recurse), list_name)
 
@@ -339,7 +340,7 @@ def get_list_belongings(list_name, kerb):
 @app.get('/lists/<string:list_name>/lists')
 @authenticated_moira
 @jsoned
-def get_list_lists(list_name, kerb):
+def get_list_lists(moira_query, list_name, kerb):
     include_properties = parse_bool(request.args.get('include_properties', False))
     recurse = parse_bool(request.args.get('recurse', True))
     res = moira_query('get_lists_of_member', conditional_recursive_type('LIST', recurse), list_name)
@@ -351,7 +352,7 @@ def get_list_lists(list_name, kerb):
 
 @app.get('/lists/<string:list_name>/owner')
 @authenticated_moira
-def get_list_admin(list_name, kerb):
+def get_list_admin(moira_query, list_name, kerb):
     res = moira_query('get_list_info', list_name)[0]
     return {
         'type': res['ace_type'].lower(),
@@ -362,7 +363,7 @@ def get_list_admin(list_name, kerb):
 @app.put('/lists/<string:list_name>/owner')
 @authenticated_moira
 @plaintext
-def set_list_admin(list_name, kerb):
+def set_list_admin(moira_query, list_name, kerb):
     attributes = create_update_list_input(list_name)
     attributes['ace_type'] = request.json['type'].upper()
     attributes['ace_name'] = request.json['name']
@@ -372,7 +373,7 @@ def set_list_admin(list_name, kerb):
 
 @app.get('/lists/<string:list_name>/membership_admin')
 @authenticated_moira
-def get_list_membership_admin(list_name, kerb):
+def get_list_membership_admin(moira_query, list_name, kerb):
     res = moira_query('get_list_info', list_name)[0]
     if res['memace_type'] == 'NONE':
         return {
@@ -386,7 +387,7 @@ def get_list_membership_admin(list_name, kerb):
 @app.put('/lists/<string:list_name>/membership_admin')
 @authenticated_moira
 @plaintext
-def set_list_membership_admin(list_name, kerb):
+def set_list_membership_admin(moira_query, list_name, kerb):
     attributes = create_update_list_input(list_name)
     attributes['memace_type'] = request.json['type'].upper()
     attributes['memace_name'] = request.json['name']
@@ -397,7 +398,7 @@ def set_list_membership_admin(list_name, kerb):
 @app.delete('/lists/<string:list_name>/membership_admin')
 @authenticated_moira
 @plaintext
-def delete_list_membership_admin(list_name, kerb):
+def delete_list_membership_admin(moira_query, list_name, kerb):
     attributes = create_update_list_input(list_name)
     attributes['memace_type'] = 'NONE'
     attributes['memace_name'] = 'NONE'
@@ -408,6 +409,7 @@ def delete_list_membership_admin(list_name, kerb):
 app.debug = True
 if __name__ == '__main__':
     # app.run(host="0.0.0.0", port=8000)
+    app.debug = True
     app.run()
 else:
     from werkzeug.middleware.proxy_fix import ProxyFix

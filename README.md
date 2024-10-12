@@ -11,6 +11,13 @@ All requests must be authenticated. There are two ways to do this:
 
 For an example on how to use webathena to get the ticket, see https://github.com/gabrc52/svelte-moira/blob/main/src/lib/webathena.ts
 
+## Changing the app name
+
+If you use this API, your app will be identified as `python3`. If you want to change this,
+set the `modby` header to your desired value (Moira has a limit of 8 characters, though).
+
+The app name you choose will show up on WebMoira or any command line utilities under "last modified".
+
 ## Errors
 
 If any of the functions returns an error, the output will be the following:
