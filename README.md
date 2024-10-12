@@ -14,7 +14,7 @@ For an example on how to use webathena to get the ticket, see https://github.com
 ## Changing the app name
 
 If you use this API, your app will be identified as `python3`. If you want to change this,
-set the `modby` header to your desired value (Moira has a limit of 8 characters, though).
+set the `modwith` header to your desired value (Moira has a limit of 8 characters, though).
 
 The app name you choose will show up on WebMoira or any command line utilities under "last modified".
 
