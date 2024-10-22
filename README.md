@@ -2,6 +2,19 @@
 
 This is an HTTP API around Moira (and possibly Mailman in the future). 
 
+## Updating the current deployment
+
+```
+you@laptop$ ssh moira-api@moira-api.mit.edu
+moira-api@moira-api$ sudo su moira-rest-api
+moira-rest-api@moira-api$ cd ~/moira-rest-api
+moira-rest-api@moira-api$ git pull
+moira-rest-api@moira-api$ exit
+moira-api@moira-api$ sudo systemctl restart moira-api
+```
+
+Ask rgabriel for credentials to access the server.
+
 ## Webathena authentication
 
 All requests must be authenticated. There are two ways to do this:
