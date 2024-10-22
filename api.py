@@ -409,18 +409,32 @@ def delete_list_membership_admin(moira_query, list_name, kerb):
 
 @app.post('/mailman/<string:list_name>/request_subscription')
 @webathena
-@plaintext
 def request_mailman_subscription(list_name, kerb):
-    mailman_request_subscription(kerb, list_name)
-    return 'success'
+    try:
+        mailman_request_subscription(kerb, list_name)
+        return "success"
+    except OSError as e:
+        # Emulate the structure of Moira errors to allow reusing existing code
+        return {
+            'code': e.errno,
+            'name': f"msmtp error number {e.errno}",
+            'message': e.strerror,
+        }, 500
 
 
 @app.post('/mailman/<string:list_name>/request_unsubscription')
 @webathena
-@plaintext
 def request_mailman_unsubscription(list_name, kerb):
-    mailman_request_unsubscription(kerb, list_name)
-    return 'success'
+    try:
+        mailman_request_unsubscription(kerb, list_name)
+        return "success"
+    except OSError as e:
+        # Emulate the structure of Moira errors to allow reusing existing code
+        return {
+            'code': e.errno,
+            'name': f"msmtp error number {e.errno}",
+            'message': e.strerror,
+        }, 500
 
 
 app.debug = True
