@@ -3,6 +3,7 @@ from flask import Flask, request, Response
 from decorators import jsoned, webathena, plaintext, authenticated_moira
 from util import *
 from flask_cors import CORS
+from mailman import mailman_request_subscription, mailman_request_unsubscription
 
 app = Flask(__name__)
 CORS(app) # to actually use the API from JavaScript
@@ -403,6 +404,22 @@ def delete_list_membership_admin(moira_query, list_name, kerb):
     attributes['memace_type'] = 'NONE'
     attributes['memace_name'] = 'NONE'
     moira_query('update_list', **attributes)
+    return 'success'
+
+
+@app.post('/mailman/<string:list_name>/request_subscription')
+@webathena
+@plaintext
+def request_mailman_subscription(list_name, kerb):
+    mailman_request_subscription(kerb, list_name)
+    return 'success'
+
+
+@app.post('/mailman/<string:list_name>/request_unsubscription')
+@webathena
+@plaintext
+def request_mailman_unsubscription(list_name, kerb):
+    mailman_request_unsubscription(kerb, list_name)
     return 'success'
 
 

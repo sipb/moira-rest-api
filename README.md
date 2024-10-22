@@ -494,3 +494,33 @@ Input should be a JSON with any subset of the following parameters: `fullname`, 
 If they are ommitted or set to null, it means those attributes should not be modified.
 
 Only pass as input those parameters you wish to modify.
+
+## Mailman
+
+Note that Moira is a big MIT system that manages more than mailing lists. Out of convenience, some helper
+API methods for Mailman lists are provided.
+
+These API queries send emails on behalf of the requesting user to request actions to be done on
+Mailman lists. These require having the `msmtp` binary installed on the server running this API.
+
+### Subscribe
+
+`POST /mailman/{name}/request_subscription`
+
+Requests a subscription to {name}, assuming it is a mailman list.
+
+Depending on the mailing list's settings, the subscribing user or the mailing list moderators will have
+to approve the request to subscribe. If you use this for a mailing list management client, it is encouraged
+to disclose this to your users, and tell them to check their email and click on the link in order to
+finalize their subscription.
+
+To be specific, this sends an email to {name}-request@mit.edu with the subject "subscribe".
+
+### Unsubscribe
+
+`POST /mailman/{name}/request_unsubscription`
+
+Requests an unsubscription to {name}, assuming it is a mailman list.
+
+Like the method before, this only requests an unsubscription. It may either be automatically approved,
+or the unsubscribing user may have to accept an email confirmation.
